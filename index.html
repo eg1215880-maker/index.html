@@ -8,7 +8,7 @@
         body { font-family: Arial, sans-serif; position: relative; }
         #gameArea { display: flex; justify-content: space-between; position: relative; width: 100%; height: 400px; }
         .tower { width: 100px; height: 200px; border: 1px solid #ccc; position: relative; }
-        .unit { width: 50px; height: 50px; position: absolute; transition: left 0.5s; }
+        .unit { width: 50px; height: 50px; position: absolute; transition: left 1s; }
         .player { background-color: blue; }
         .bot { background-color: red; }
     </style>
@@ -26,30 +26,31 @@
         let botInterval;
 
         function playCard() {
-            const unit = createUnit('player');
+            const unit = createUnit('player', Math.random() * 200 + 400); // Random speed for more realism
             moveUnit(unit, 'rightTower');
 
-            // Start bot actions if not already started
             if (!botInterval) {
                 botInterval = setInterval(botPlay, 3000);
             }
         }
 
         function botPlay() {
-            const unit = createUnit('bot');
+            const unit = createUnit('bot', Math.random() * 200 + 400); // Random speed for bot
             moveUnit(unit, 'leftTower');
         }
 
-        function createUnit(role) {
+        function createUnit(role, speed) {
             const unit = document.createElement("div");
             unit.className = "unit " + (role === 'bot' ? 'bot' : 'player');
             unit.style.left = '0px'; // Start position
+            unit.dataset.speed = speed; // Store speed for later use
             document.getElementById("gameArea").appendChild(unit);
             return unit;
         }
 
         function moveUnit(unit, targetTower) {
             const targetPosition = targetTower === 'rightTower' ? 800 : 0; // Move to the right or left tower
+            unit.style.transitionDuration = unit.dataset.speed + 'ms'; // Set transition duration based on speed
             unit.style.left = targetPosition + 'px'; // Move to the specified tower
 
             setTimeout(() => {
@@ -57,7 +58,7 @@
                     alert(role === 'bot' ? 'Bot hit your tower!' : 'You hit the bot tower!');
                     unit.remove(); // Remove unit upon collision
                 }
-            }, 500); // Check collision after movement
+            }, unit.dataset.speed); // Check collision after movement duration
         }
 
         function checkCollision(unit, targetTower) {
