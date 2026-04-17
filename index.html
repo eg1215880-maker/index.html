@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clash Royale Clone</title>
+    <style>
+        body { font-family: Arial, sans-serif; position: relative; }
+        #gameArea { display: flex; justify-content: space-between; position: relative; width: 100%; height: 400px; }
+        .tower { width: 100px; height: 200px; border: 1px solid #ccc; position: relative; }
+        .unit { width: 50px; height: 50px; position: absolute; transition: left 0.5s; }
+        .player { background-color: blue; }
+        .bot { background-color: red; }
+    </style>
+</head>
+<body>
+    <h1>Clash Royale Clone</h1>
+    <div id="gameArea">
+        <div class="tower" id="leftTower">Left Tower</div>
+        <div class="tower" id="rightTower">Right Tower</div>
+    </div>
+    <div id="deck">
+        <button onclick="playCard()">Play Troop</button>
+    </div>
+    <script>
+        let botInterval;
+
+        function playCard() {
+            const unit = createUnit('player');
+            moveUnit(unit, 'rightTower');
+
+            // Start bot actions if not already started
+            if (!botInterval) {
+                botInterval = setInterval(botPlay, 3000);
+            }
+        }
+
+        function botPlay() {
+            const unit = createUnit('bot');
+            moveUnit(unit, 'leftTower');
+        }
+
+        function createUnit(role) {
+            const unit = document.createElement("div");
+            unit.className = "unit " + (role === 'bot' ? 'bot' : 'player');
+            unit.style.left = '0px'; // Start position
+            document.getElementById("gameArea").appendChild(unit);
+            return unit;
+        }
+
+        function moveUnit(unit, targetTower) {
+            const targetPosition = targetTower === 'rightTower' ? 800 : 0; // Move to the right or left tower
+            unit.style.left = targetPosition + 'px'; // Move to the specified tower
+
+            setTimeout(() => {
+                if (checkCollision(unit, targetTower)) {
+                    alert(role === 'bot' ? 'Bot hit your tower!' : 'You hit the bot tower!');
+                    unit.remove(); // Remove unit upon collision
+                }
+            }, 500); // Check collision after movement
+        }
+
+        function checkCollision(unit, targetTower) {
+            const tower = document.getElementById(targetTower).getBoundingClientRect();
+            const unitRect = unit.getBoundingClientRect();
+            return !(
+                unitRect.right < tower.left ||
+                unitRect.left > tower.right ||
+                unitRect.bottom < tower.top ||
+                unitRect.top > tower.bottom
+            );
+        }
+    </script>
+</body>
+</html>
